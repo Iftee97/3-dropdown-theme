@@ -15,13 +15,16 @@ export default function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    getColl1Names()
-    if (selectedColl1Name) {
-      getColl2Names()
+    async function getCollectionsNames() {
+      await getColl1Names()
+      if (selectedColl1Name) {
+        await getColl2Names()
+      }
+      if (selectedColl1Name && selectedColl2Name) {
+        await getColl3Names()
+      }
     }
-    if (selectedColl1Name && selectedColl2Name) {
-      getColl3Names()
-    }
+    getCollectionsNames()
   }, [selectedColl1Name, selectedColl2Name])
 
   async function getColl1Names() {
@@ -116,7 +119,7 @@ export default function App() {
               required
             >
               <option value=''>
-                Null
+                Select Collection-1
               </option>
               {coll1Names.map((coll, index) => (
                 <option key={index} value={coll.collection1Name}>
@@ -134,9 +137,10 @@ export default function App() {
               onChange={(e) => setSelectedColl2Name(e.target.value)}
               className={styles.field}
               disabled={!selectedColl1Name}
+              style={{ cursor: !selectedColl1Name && 'not-allowed' }}
             >
               <option value=''>
-                Null
+                Select Collection-2
               </option>
               {coll2Names?.length > 0 && coll2Names.map((coll, index) => (
                 <option key={index} value={coll.collection2Name}>
@@ -154,9 +158,10 @@ export default function App() {
               onChange={(e) => setSelectedColl3Name(e.target.value)}
               className={styles.field}
               disabled={!selectedColl1Name || !selectedColl2Name}
+              style={{ cursor: (!selectedColl1Name || !selectedColl2Name) && 'not-allowed' }}
             >
               <option value=''>
-                Null
+                Select Collection-3
               </option>
               {coll3Names?.length > 0 && coll3Names.map((coll, index) => (
                 <option key={index} value={coll.collection3Name}>
@@ -172,9 +177,7 @@ export default function App() {
             style={{ cursor: !selectedColl1Name ? 'not-allowed' : 'pointer' }}
           >
             {loading ? (
-              <div style={{ margin: '0 auto' }}>
-                <LoadingSpinner />
-              </div>
+              <LoadingSpinner />
             ) : (
               <SearchIcon />
             )}
