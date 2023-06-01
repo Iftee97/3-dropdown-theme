@@ -10,6 +10,8 @@ export default function App() {
   const [selectedColl2Name, setSelectedColl2Name] = useState('')
   const [selectedColl3Name, setSelectedColl3Name] = useState('')
   const [coll1NameError, setColl1NameError] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -23,27 +25,45 @@ export default function App() {
   }, [selectedColl1Name, selectedColl2Name])
 
   async function getColl1Names() {
-    const res = await fetch('http://localhost:4000/proxy_route/unique-collection1-names')
-    const data = await res.json()
-    setColl1Names(data)
+    try {
+      setLoading(true)
+      const res = await fetch('http://localhost:4000/proxy_route/unique-collection1-names')
+      const data = await res.json()
+      setColl1Names(data)
+      setLoading(false)
+    } catch (error) {
+      setError('Error! Failed to fetch collection names. Try Again!')
+    }
   }
 
   async function getColl2Names() {
     if (!selectedColl1Name) {
       return
     }
-    const res = await fetch(`http://localhost:4000/proxy_route/unique-collection2-names?name=${selectedColl1Name}`)
-    const data = await res.json()
-    setColl2Names(data)
+    try {
+      setLoading(true)
+      const res = await fetch(`http://localhost:4000/proxy_route/unique-collection2-names?name=${selectedColl1Name}`)
+      const data = await res.json()
+      setColl2Names(data)
+      setLoading(false)
+    } catch (error) {
+      setError('Error! Failed to fetch collection names. Try Again!')
+    }
   }
 
   async function getColl3Names() {
     if (!selectedColl1Name && !selectedColl2Name) {
       return
     }
-    const res = await fetch(`http://localhost:4000/proxy_route/unique-collection3-names?name1=${selectedColl1Name}&name2=${selectedColl2Name}`)
-    const data = await res.json()
-    setColl3Names(data)
+    try {
+      setLoading(true)
+      const res = await fetch(`http://localhost:4000/proxy_route/unique-collection3-names?name1=${selectedColl1Name}&name2=${selectedColl2Name}`)
+      const data = await res.json()
+      setColl3Names(data)
+      setLoading(false)
+    } catch (error) {
+      setError('Error! Failed to fetch collection names. Try Again!')
+    }
   }
 
   async function handleSubmit(e) {
@@ -151,7 +171,13 @@ export default function App() {
             disabled={!selectedColl1Name || coll1NameError}
             style={{ cursor: !selectedColl1Name ? 'not-allowed' : 'pointer' }}
           >
-            <SearchIcon />
+            {loading ? (
+              <div style={{ margin: '0 auto' }}>
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <SearchIcon />
+            )}
           </button>
         </form>
       </div>
@@ -164,5 +190,11 @@ function SearchIcon() {
     <svg className={styles.searchIcon} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M16.5 16.5L12.875 12.875M14.8333 8.16667C14.8333 11.8486 11.8486 14.8333 8.16667 14.8333C4.48477 14.8333 1.5 11.8486 1.5 8.16667C1.5 4.48477 4.48477 1.5 8.16667 1.5C11.8486 1.5 14.8333 4.48477 14.8333 8.16667Z" stroke="#666666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  )
+}
+
+function LoadingSpinner() {
+  return (
+    <div className={styles.spinner} />
   )
 }
